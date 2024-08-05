@@ -22,4 +22,5 @@ public class StudentManagementApplication {
 	//POSTは情報を与える、渡す
 */
 
+	//コード変更を行った体でPRテスト
 }
