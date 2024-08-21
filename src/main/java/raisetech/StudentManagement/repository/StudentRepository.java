@@ -1,11 +1,8 @@
 package raisetech.StudentManagement.repository;
-
 import org.apache.ibatis.annotations.*;
-import raisetech.StudentManagement.data.Course;
+import raisetech.StudentManagement.data.StudentsCourses;
 import raisetech.StudentManagement.data.Student;
-
 import java.util.List;
-
 /**
  * 受講生情報を扱うリポジトリ
  *
@@ -14,7 +11,6 @@ import java.util.List;
 //データベースを操作するためのもの
 @Mapper
 public interface StudentRepository {
-
     /**
      * 全件検索します
      *
@@ -22,7 +18,6 @@ public interface StudentRepository {
      */
     @Select("SELECT * FROM students")
     List<Student> search();
-
     @Select("SELECT * FROM students_courses")
-    List<Course> explore();
+    List<StudentsCourses> explore();
 }
