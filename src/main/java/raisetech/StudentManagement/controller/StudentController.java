@@ -1,6 +1,8 @@
 package raisetech.StudentManagement.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import raisetech.StudentManagement.controller.converter.StudentConverter;
@@ -13,7 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@RestController
+@Controller
 public class StudentController {
     private StudentService service;
     private StudentConverter converter;
@@ -26,13 +28,13 @@ public class StudentController {
     //データベースからデータを取ってくる
     //select
     @GetMapping("/studentList")
-    public List<StudentDetail> getStudentList() {
+    public String getStudentList(Model model) {
         List<Student> students = service.searchStudentList();
         List<StudentsCourses> studentsCourses = service.searchStudentsCourseList();
 
-        return converter.convertStudentDetails(students, studentsCourses);
+        model.addAttribute("studentList" , converter.convertStudentDetails(students, studentsCourses));
+        return "studentList";
         }
-
 
     @GetMapping("/studentsCourseList")
     public List<StudentsCourses> getStudentsCourseList(){
