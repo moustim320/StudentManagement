@@ -20,4 +20,13 @@ public interface StudentRepository {
     List<Student> search();
     @Select("SELECT * FROM students_courses")
     List<StudentsCourses> explore();
+    @Insert("INSERT INTO students(name, kana_name, nickname, mail_address, address, age, gender, remark, isDeleted)" +
+            " VALUES(#{name}, #{kanaName}, #{nickname}, #{mailAddress}, #{address}, #{age}, #{gender}, #{remark}, false)")
+    @Options(useGeneratedKeys = true, keyProperty = "id")
+    void registerStudent(Student student);
+
+    @Insert("INSERT INTO students_courses(student_id, course_name, course_start_at, course_end_at)" +
+            "VALUES(#{studentId}, #{courseName}, #{courseStartAt}, #{courseEndAt})")
+    @Options(useGeneratedKeys = true, keyProperty = "id")
+    void registerStudentsCourses(StudentsCourses studentsCourses);
 }
