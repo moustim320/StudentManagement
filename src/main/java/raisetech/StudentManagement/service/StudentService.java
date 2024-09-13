@@ -10,7 +10,6 @@ import raisetech.StudentManagement.repository.StudentRepository;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class StudentService {
@@ -21,23 +20,40 @@ public class StudentService {
     public StudentService(StudentRepository repository){
         this.repository = repository;
     }
+
     public List<Student> searchStudentList(){
         return repository.search();
     }
+
+    public StudentDetail searchStudent(String id){
+        Student student = repository.searchStudent(id);
+        List<StudentsCourses> studentsCourses = repository.searchStudentsCourses(student.getId());
+        StudentDetail studentDetail = new StudentDetail();
+        studentDetail.setStudent(student);
+        studentDetail.setStudentsCourses(studentsCourses);
+        return studentDetail;
+    }
     public List<StudentsCourses> searchStudentsCourseList(){
-        return repository.explore();
+        return repository.searchStudentsCourseList();
     }
 
     @Transactional
     public void registerStudent(StudentDetail studentDetail) {
         repository.registerStudent(studentDetail.getStudent());
-        //TODO:コース情報登録も行う
-        for(StudentsCourses studentsCourses:studentDetail.getStudentsCourses()){
+        for (StudentsCourses studentsCourses : studentDetail.getStudentsCourses()) {
             studentsCourses.setStudentId(studentDetail.getStudent().getId());
             studentsCourses.setCourseStartAt(LocalDateTime.now());
             studentsCourses.setCourseEndAt(LocalDateTime.now().plusYears(1));
             repository.registerStudentsCourses(studentsCourses);
         }
+    }
+    @Transactional
+    public void updateStudent(StudentDetail studentDetail) {
+        repository.updateStudent(studentDetail.getStudent());
+        for(StudentsCourses studentsCourse : studentDetail.getStudentsCourses()){
+            studentsCourse.setStudentId(studentDetail.getStudent().getId());
+            repository.updateStudentsCourses(studentsCourse);
         }
+    }
 
 }
