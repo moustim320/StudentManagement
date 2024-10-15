@@ -1,6 +1,7 @@
 package raisetech.StudentManagement.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -16,7 +17,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Controller
+@RestController
 public class StudentController {
     private StudentService service;
     private StudentConverter converter;
@@ -28,25 +29,26 @@ public class StudentController {
     }
 
     @GetMapping("/studentList")
-    public String getStudentList(Model model) {
+    public List<StudentDetail> getStudentList() {
         List<Student> students = service.searchStudentList();
         List<StudentsCourses> studentsCourses = service.searchStudentsCourseList();
-
-        model.addAttribute("studentList" , converter.convertStudentDetails(students, studentsCourses));
-        return "studentList";
+        return converter.convertStudentDetails(students, studentsCourses);
         }
 
+    /*不要
     @GetMapping("/student/{id}")
     public String getStudent(@PathVariable String id, Model model){
         StudentDetail studentDetail = service.searchStudent(id);
         model.addAttribute("studentDetail", studentDetail);
         return "updateStudent";
     }
+    */
+    /*不要
     @GetMapping("/studentsCourseList")
     public List<StudentsCourses> getStudentsCourseList(){
         return service.searchStudentsCourseList();
     }
-
+    */
     @GetMapping("/newStudent")
     public String newStudent(Model model){
         StudentDetail studentDetail = new StudentDetail();
@@ -66,12 +68,9 @@ public class StudentController {
 
 
     @PostMapping("/updateStudent")
-    public String updateStudent(@ModelAttribute StudentDetail studentDetail, BindingResult result){
-        if(result.hasErrors()){
-            return "updateStudent";
-        }
+    public ResponseEntity<String> updateStudent(@RequestBody StudentDetail studentDetail){
         service.updateStudent(studentDetail);
-        return "redirect:/studentList";
+        return ResponseEntity.ok("更新処理が成功しました。");
     }
 
 }
