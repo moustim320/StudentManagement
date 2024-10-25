@@ -1,6 +1,5 @@
 package raisetech.StudentManagement.data;
 
-
 import lombok.Getter;
 import lombok.Setter;
 
