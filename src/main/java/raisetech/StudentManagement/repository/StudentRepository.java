@@ -14,7 +14,6 @@ public interface StudentRepository {
      * 受講生の全件検索を行います。
      * @return 受講生一覧（全件）
      */
-    @Select("SELECT * FROM students")
     List<Student> search();
 
     /**
@@ -22,14 +21,12 @@ public interface StudentRepository {
      * @param id 受講生ID
      * @return 受講生
      */
-    @Select("SELECT * FROM students WHERE id = #{id}")
     Student searchStudent(String id);
 
     /**
      * 受講生のコース情報の全件検索を行います。
      * @return 受講生のコース情報（全件）
      */
-    @Select("SELECT * FROM students_courses")
     List<StudentCourse> searchStudentCourseList();
 
     /**
@@ -37,7 +34,6 @@ public interface StudentRepository {
      * @param studentId 受講生ID
      * @return 受講生IDに紐づく受講生コース情報
      */
-    @Select("SELECT * FROM students_courses WHERE student_id = #{studentId}")
     List<StudentCourse> searchStudentCourse(String studentId);
 
     /**
@@ -46,9 +42,6 @@ public interface StudentRepository {
      *
      * @param student 受講生
      */
-    @Insert("INSERT INTO students(name, kana_name, nickname, mail_address, address, age, gender, remark, isDeleted)" +
-            " VALUES(#{name}, #{kanaName}, #{nickname}, #{mailAddress}, #{address}, #{age}, #{gender}, #{remark}, false)")
-    @Options(useGeneratedKeys = true, keyProperty = "id")
     void registerStudent(Student student);
 
     /**
@@ -57,23 +50,17 @@ public interface StudentRepository {
      *
      * @param studentCourse 受講生コース情報
      */
-    @Insert("INSERT INTO students_courses(student_id, course_name, course_start_at, course_end_at)" +
-            "VALUES(#{studentId}, #{courseName}, #{courseStartAt}, #{courseEndAt})")
-    @Options(useGeneratedKeys = true, keyProperty = "id")
     void registerStudentCourse(StudentCourse studentCourse);
 
     /**
      * 受講生を更新します。
      * @param student 受講生
      */
-    @Update("UPDATE students SET name = #{name}, kana_name = #{kanaName}, nickname = #{nickname}, " +
-            "mail_address = #{mailAddress}, address = #{address}, age = #{age}, gender = #{gender}, remark = #{remark}, isDeleted = #{isDeleted} WHERE id = #{id}")
     void updateStudent(Student student);
 
     /**
      * 受講生コース情報のコース名を更新します。
      * @param studentCourse 受講生コース情報
      */
-    @Update("UPDATE students_courses SET course_name = #{courseName}  WHERE id = #{id}")
     void updateStudentCourse(StudentCourse studentCourse);
 }
