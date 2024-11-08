@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import raisetech.StudentManagement.domein.StudentDetail;
+import raisetech.StudentManagement.exceptionHandler.TestException;
 import raisetech.StudentManagement.service.StudentService;
 
 import java.util.List;
@@ -35,6 +36,11 @@ public class StudentController {
     @GetMapping("/studentList")
     public List<StudentDetail> getStudentList() {
         return service.searchStudentList();
+    }
+
+    @GetMapping("/studentListException")
+    public List<StudentDetail> getStudentListException() throws TestException {
+        throw new TestException("エラーが発生しました。");
     }
 
     /**
@@ -79,4 +85,6 @@ public class StudentController {
     }
 
     //基本的にputは全体的な更新、patchは部分的な更新に使う
+
+
 }
