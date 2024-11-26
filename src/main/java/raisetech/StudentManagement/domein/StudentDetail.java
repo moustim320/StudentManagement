@@ -11,6 +11,7 @@ import raisetech.StudentManagement.data.Student;
 import raisetech.StudentManagement.data.StudentCourse;
 
 import java.util.List;
+import java.util.Objects;
 
 @Schema(description = "受講生")
 @Getter
