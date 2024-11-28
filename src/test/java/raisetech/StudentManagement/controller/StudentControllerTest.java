@@ -37,7 +37,7 @@ class StudentControllerTest {
     private Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
 
     @Test
-    void 受講生詳細の一覧検が実行できて空のリストが返ってくること() throws Exception{
+    void 受講生詳細の一覧検索が実行できて空のリストが返ってくること() throws Exception{
         mockMvc.perform(get("/studentList"))
                 .andExpect(status().isOk())
                 .andExpect(content().json("[]"));
@@ -80,7 +80,8 @@ class StudentControllerTest {
                     }
                     """
         ))
-        .andExpect(status().isOk());  // レスポンスのステータスコードを検証
+        .andExpect(status().isOk()) // レスポンスのステータスコードを検証
+        .andExpect(content().string(""));  // レスポンスが空であることを検証
 
         verify(service, times(1)).registerStudent(any());  // サービス層が呼び出されたか検証
     }
@@ -114,7 +115,8 @@ class StudentControllerTest {
                             }
                             """
                 ))
-                .andExpect(status().isOk());  // レスポンスのステータスコードを検証
+                .andExpect(status().isOk())  // レスポンスのステータスコードを検証
+                .andExpect(content().string("更新処理が成功しました。"));  // レスポンスが空であることを検証
 
         verify(service, times(1)).updateStudent(any());  // サービス層が呼び出されたか検証
     }
