@@ -87,7 +87,7 @@ class StudentControllerTest {
     }
 
     @Test
-    void 受講生詳細の更新が実行できて空で返ってくること() throws Exception {
+    void 受講生詳細の更新が実行できて成功メッセージが返ること() throws Exception {
         // リクエストデータは適切に構築して入力チェックの検証も兼ねている。
         mockMvc.perform(put("/updateStudent").contentType(MediaType.APPLICATION_JSON).content(
                         """
@@ -115,8 +115,8 @@ class StudentControllerTest {
                             }
                             """
                 ))
-                .andExpect(status().isOk())  // レスポンスのステータスコードを検証
-                .andExpect(content().string("更新処理が成功しました。"));  // レスポンスが空であることを検証
+                .andExpect(status().isOk())  // ステータスコード 200 OK を確認
+                .andExpect(content().string("更新処理が成功しました。"));  // 更新処理の成功を示すレスポンス
 
         verify(service, times(1)).updateStudent(any());  // サービス層が呼び出されたか検証
     }
