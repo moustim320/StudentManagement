@@ -12,12 +12,18 @@ import raisetech.StudentManagement.data.StudentCourse;
 import raisetech.StudentManagement.domein.StudentDetail;
 import raisetech.StudentManagement.repository.StudentRepository;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.any;
 
 @ExtendWith(MockitoExtension.class)
 class StudentServiceTest {
@@ -66,7 +72,7 @@ class StudentServiceTest {
 
         verify(repository, times(1)).searchStudent(id);
         verify(repository, times(1)).searchStudentCourse(id);
-        Assertions.assertEquals(expected.getStudent().getId(), actual.getStudent().getId());
+        assertEquals(expected.getStudent().getId(), actual.getStudent().getId());
     }
 
 
@@ -75,6 +81,8 @@ class StudentServiceTest {
     void 受講生登録処理_リポジトリの処理が適切に呼び出され期待通りの結果を返すこと() {
         // Arrange
         Student mockStudent = new Student();
+        mockStudent.setId("1"); // IDをStringとして設定
+
         StudentCourse course1 = new StudentCourse();
         StudentCourse course2 = new StudentCourse();
         List<StudentCourse> courseList = List.of(course1, course2);
@@ -83,6 +91,14 @@ class StudentServiceTest {
 
         doNothing().when(repository).registerStudent(mockStudent);
         doNothing().when(repository).registerStudentCourse(any(StudentCourse.class));
+
+        // initStudentsCourse と同じロジックを適用して期待値を準備
+        LocalDateTime now = LocalDateTime.now();
+        courseList.forEach(course -> {
+            course.setStudentId(mockStudent.getId());
+            course.setCourseStartAt(now);
+            course.setCourseEndAt(now.plusYears(1));
+        });
 
         // Act
         StudentDetail result = sut.registerStudent(mockStudentDetail);
@@ -98,8 +114,26 @@ class StudentServiceTest {
         // 各 StudentCourse の初期化処理を検証
         courseList.forEach(course -> {
             assertEquals(mockStudent.getId(), course.getStudentId());
+            assertNotNull(course.getCourseStartAt());
+            assertNotNull(course.getCourseEndAt());
         });
     }
+
+    @Test
+    void 受講生詳細の登録_初期化処理が行われること() {
+        String id = "123";
+        Student student = new Student();
+        student.setId(id);
+        StudentCourse studentCourse = new StudentCourse();
+
+        sut.initStudentsCourse(studentCourse, student.getId());
+
+        assertEquals(id, studentCourse.getStudentId());
+        assertEquals(LocalDateTime.now().getHour(), studentCourse.getCourseStartAt().getHour());
+        assertEquals(LocalDateTime.now().plusYears(1).getYear(), studentCourse.getCourseEndAt().getYear());
+
+    }
+
 
     @Test
     void 受講生情報更新処理_リポジトリの処理が適切に呼び出されること() {
