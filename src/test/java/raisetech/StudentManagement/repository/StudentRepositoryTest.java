@@ -25,6 +25,15 @@ class StudentRepositoryTest {
 
         //初期状態では５件のデータが存在していることを確認
         assertThat(actual.size()).isEqualTo(5);
+
+        // データの中身をチェック
+        assertThat(actual.get(0).getName()).isEqualTo("大野 智");
+        assertThat(actual.get(0).getKanaName()).isEqualTo("オオノ サトシ");
+        assertThat(actual.get(0).getNickname()).isEqualTo("リーダー");
+        assertThat(actual.get(0).getMailAddress()).isEqualTo("satoshiohno@ara.shi");
+        assertThat(actual.get(0).getAddress()).isEqualTo("東京都");
+        assertThat(actual.get(0).getAge()).isEqualTo(43);
+        assertThat(actual.get(0).getGender()).isEqualTo("男");
     }
 
     @Test
@@ -53,12 +62,24 @@ class StudentRepositoryTest {
         Student actual = sut.searchStudent("1");
         assertThat(actual).isNotNull();
         assertThat(actual.getName()).isEqualTo("大野 智");
+        assertThat(actual.getKanaName()).isEqualTo("オオノ サトシ");
+        assertThat(actual.getNickname()).isEqualTo("リーダー");
+        assertThat(actual.getMailAddress()).isEqualTo("satoshiohno@ara.shi");
+        assertThat(actual.getAddress()).isEqualTo("東京都");
+        assertThat(actual.getAge()).isEqualTo(43);
+        assertThat(actual.getGender()).isEqualTo("男");
     }
 
     @Test
     void 受講生のコース情報を全件取得できること() {
         List<StudentCourse> actual = sut.searchStudentCourseList();
         assertThat(actual.size()).isEqualTo(11); //初期データに基づく件数
+
+        // データの中身をチェック
+        assertThat(actual.get(0).getStudentId()).isEqualTo("1");
+        assertThat(actual.get(0).getCourseName()).isEqualTo("Aコース");
+        assertThat(actual.get(0).getCourseStartAt()).isEqualTo(LocalDateTime.of(2024, 4, 1, 0, 0));
+        assertThat(actual.get(0).getCourseEndAt()).isEqualTo(LocalDateTime.of(2025, 3, 31, 0, 0));
     }
 
     @Test
@@ -66,6 +87,8 @@ class StudentRepositoryTest {
         List<StudentCourse> actual = sut.searchStudentCourse("1");
         assertThat(actual.size()).isEqualTo(1); //ID=1の受講生のコース件数
         assertThat(actual.get(0).getCourseName()).isEqualTo("Aコース");
+        assertThat(actual.get(0).getCourseStartAt()).isEqualTo(LocalDateTime.of(2024, 4, 1, 0, 0));
+        assertThat(actual.get(0).getCourseEndAt()).isEqualTo(LocalDateTime.of(2025, 3, 31, 0, 0));
     }
 
     @Test
@@ -106,5 +129,5 @@ class StudentRepositoryTest {
         List<StudentCourse> updateCourses = sut.searchStudentCourse("1");
         assertThat(updateCourses.get(0).getCourseName()).isEqualTo("新しいコース名");
     }
-    
+
 }
