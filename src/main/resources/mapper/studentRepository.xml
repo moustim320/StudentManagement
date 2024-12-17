@@ -22,6 +22,13 @@
         SELECT * FROM students_courses WHERE student_id = #{studentId}
     </select>
 
+    <select id="searchStudentCourseListWithConditions" parameterType="map" resultType="raisetech.StudentManagement.data.StudentCourse">
+        SELECT * FROM students_courses WHERE (course_name LIKE CONCAT('%', #{courseName}, '%') OR #{courseName} IS NULL)
+        AND (course_start_at >= #{startDate} OR #{startDate} IS NULL)
+        AND (course_end_at <![CDATA[<=]]> #{endDate} OR #{endDate} IS NULL)
+        AND (status = #{status} OR #{status} IS NULL)
+    </select>
+
     <!--受講生の新規登録-->
     <insert id="registerStudent" parameterType="raisetech.StudentManagement.data.Student" useGeneratedKeys = "true" keyProperty = "id">
         INSERT INTO students(name, kana_name, nickname, mail_address, address, age, gender, remark, isDeleted)

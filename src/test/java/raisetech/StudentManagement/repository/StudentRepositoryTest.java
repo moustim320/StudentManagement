@@ -71,6 +71,19 @@ class StudentRepositoryTest {
     }
 
     @Test
+    void 指定した条件で受講生を検索できること() {
+        // 検索条件
+        String name = "大野 智";
+
+        // メソッド呼び出し
+        List<Student> result = sut.searchWithConditions(name);
+
+        // 結果の確認
+        assertThat(result).hasSize(1); // 1件だけ一致することを確認
+        assertThat(result.get(0).getName()).isEqualTo(name); // 名前が一致することを確認
+    }
+
+    @Test
     void 受講生のコース情報を全件取得できること() {
         List<StudentCourse> actual = sut.searchStudentCourseList();
         assertThat(actual.size()).isEqualTo(11); //初期データに基づく件数
@@ -89,6 +102,24 @@ class StudentRepositoryTest {
         assertThat(actual.get(0).getCourseName()).isEqualTo("Aコース");
         assertThat(actual.get(0).getCourseStartAt()).isEqualTo(LocalDateTime.of(2024, 4, 1, 0, 0));
         assertThat(actual.get(0).getCourseEndAt()).isEqualTo(LocalDateTime.of(2025, 3, 31, 0, 0));
+    }
+
+    @Test
+    void 指定した条件で受講生のコース情報を検索できること() {
+        // 検索条件
+        String courseName = "Aコース";
+        LocalDateTime startDate = LocalDateTime.of(2024, 4, 1, 0, 0);
+        LocalDateTime endDate = LocalDateTime.of(2025, 3, 31, 0, 0);
+        String status = "仮申込"; // 仮のステータス
+
+        // メソッド呼び出し
+        List<StudentCourse> result = sut.searchStudentCourseListWithConditions(courseName, startDate, endDate, status);
+
+        // 結果の確認
+        assertThat(result).hasSize(1); // 条件に一致するコースが1件だけあることを確認
+        assertThat(result.get(0).getCourseName()).isEqualTo(courseName); // コース名が一致することを確認
+        assertThat(result.get(0).getCourseStartAt()).isEqualTo(startDate); // 開始日が一致することを確認
+        assertThat(result.get(0).getCourseEndAt()).isEqualTo(endDate); // 終了日が一致することを確認
     }
 
     @Test

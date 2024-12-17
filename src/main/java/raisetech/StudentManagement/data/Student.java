@@ -32,12 +32,13 @@ public class Student {
     @NotBlank
     private String address;
 
+    @Min(value = 0, message = "年齢は0以上である必要があります。")
     private int age;
 
-    @NotBlank
+    @Pattern(regexp = "^(男|女|その他)$", message = "性別は「男」「女」「その他」から選択してください。")
     private String gender;
 
     private String remark;
-    private boolean isDeleted;
+    private boolean isDeleted = false;
 }
 

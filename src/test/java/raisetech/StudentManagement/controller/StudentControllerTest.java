@@ -13,6 +13,8 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import raisetech.StudentManagement.data.Student;
 import raisetech.StudentManagement.service.StudentService;
 
+import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -38,11 +40,31 @@ class StudentControllerTest {
 
     @Test
     void 受講生詳細の一覧検索が実行できて空のリストが返ってくること() throws Exception{
-        mockMvc.perform(get("/studentList"))
-                .andExpect(status().isOk())
-                .andExpect(content().json("[]"));
+        // モックサービスでメソッドの戻り値を設定
+        when(service.searchStudentList(
+                any(String.class),       // 引数1: String
+                any(String.class),       // 引数2: String
+                any(LocalDateTime.class), // 引数3: LocalDateTime
+                any(LocalDateTime.class), // 引数4: LocalDateTime
+                any(String.class)        // 引数5: String
+        )).thenReturn(Collections.emptyList());
 
-        verify(service, times(1)).searchStudentList();
+        // MockMvc でリクエストを実行する部分
+        mockMvc.perform(get("/studentList")  // エンドポイントを指定
+                .param("name", "森本光雄")   // リクエストパラメータを指定
+                .param("courseNme", "Aコース")
+                .param("startDate", "2024-04-01T00:00:00")  // ISO8601形式の日時
+                .param("endDate", "2025-03-31T00:00:00")
+                .param("status", "仮申込"))
+                .andExpect(status().isOk())       // HTTPステータス200を期待
+                .andExpect(content().json("[]")); // 空のリストが返ることを検証
+
+        // サービスが正しく呼ばれたことを検証
+        verify(service, times(1)).searchStudentList(
+                "森本光雄", "Aコース",
+                LocalDateTime.parse("2024-04-01T00:00:00"),
+                LocalDateTime.parse("2025-03-31T00:00:00"),
+                "仮申込");
     }
 
     @Test

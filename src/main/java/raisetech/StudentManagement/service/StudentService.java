@@ -29,13 +29,18 @@ public class StudentService {
     }
 
     /**
-     * 受講生詳細の一覧検索です。
-     * 全件検索を行うので、条件指定は行わないものになります。
-     * @return 受講生一覧（全件）
+     * 受講生詳細の検索です。
+     * 条件が指定されない場合は全件検索を行います。
+     *
+     * @param name 受講生の名前
+     * @param courseName コース名
+     * @param startDate 受講開始日
+     * @param endDate 受講終了日
+     * @return 条件に合致した、または全件の受講生一覧
      */
-    public List<StudentDetail> searchStudentList(){
-        List<Student> studentList = repository.search();
-        List<StudentCourse> studentCourseList = repository.searchStudentCourseList();
+    public List<StudentDetail> searchStudentList(String name, String courseName, LocalDateTime startDate, LocalDateTime endDate, String status) {
+        List<Student> studentList = repository.searchWithConditions(name);
+        List<StudentCourse> studentCourseList = repository.searchStudentCourseListWithConditions(courseName, startDate, endDate, status);
         return converter.convertStudentDetails(studentList, studentCourseList);
     }
 
@@ -80,6 +85,8 @@ public class StudentService {
         studentCourse.setStudentId(String.valueOf(id));
         studentCourse.setCourseStartAt(now);
         studentCourse.setCourseEndAt(now.plusYears(1));
+        //新規登録時の初期ステータスを設定
+        studentCourse.setStatus("仮申込");
     }
 
     /**
@@ -92,6 +99,19 @@ public class StudentService {
         repository.updateStudent(studentDetail.getStudent());
         studentDetail.getStudentCourseList()
                 .forEach(studentCourse -> repository.updateStudentCourse(studentCourse));
+    }
+
+    public void updateCourseStatus(StudentCourse course, String newStatus) {
+        String currentStatus = course.getStatus();
+        if (currentStatus.equals("仮申込") && newStatus.equals("本申込")) {
+            course.setStatus(newStatus);
+        } else if (currentStatus.equals("本申込") && newStatus.equals("受講中")) {
+            course.setStatus(newStatus);
+        } else if (currentStatus.equals("受講中") && newStatus.equals("受講終了")) {
+            course.setStatus(newStatus);
+        } else {
+            throw new IllegalStateException("無効なステータス遷移：" + currentStatus + "->" + newStatus);
+        }
     }
 
 }
