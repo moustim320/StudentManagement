@@ -1,11 +1,11 @@
 package raisetech.StudentManagement.service;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.transaction.annotation.Transactional;
 import raisetech.StudentManagement.controller.converter.StudentConverter;
 import raisetech.StudentManagement.data.Student;
 import raisetech.StudentManagement.data.StudentCourse;
@@ -17,7 +17,9 @@ import java.util.ArrayList;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.times;
@@ -168,7 +170,7 @@ class StudentServiceTest {
     }
 
     @Test
-    void 新規コース登録時の初期ステータスが仮申込であることを確認する() {
+    void 新規コース登録時の初期ステータスが仮申込であることを確認できること() {
         // 準備
         StudentCourse course = new StudentCourse();
         // 実行
@@ -181,18 +183,31 @@ class StudentServiceTest {
     }
 
     @Test
+    @Transactional
+    public void 指定したコースIDに対して新しいステータスを正しく更新できること() {
+        String courseId = "1"; // テストデータのコースID
+        String newStatus = "本申込";
+
+        sut.updateCourseStatus(courseId, newStatus);
+
+        StudentCourse updatedCourse = repository.searchStudentCourse(courseId).get(0);
+        assertEquals(newStatus, updatedCourse.getStatus());
+    }
+
+    @Test
     void ステータス更新の確認_正しい順序で更新されていること() {
         // 準備
         StudentCourse course = new StudentCourse();
+        course.setId("123");
         course.setStatus("仮申込");
         // 実行、検証
-        sut.updateCourseStatus(course, "本申込");
+        sut.updateCourseStatus(course.getId(), "本申込");
         assertEquals("本申込", course.getStatus());
 
-        sut.updateCourseStatus(course, "受講中");
+        sut.updateCourseStatus(course.getId(), "受講中");
         assertEquals("受講中", course.getStatus());
 
-        sut.updateCourseStatus(course, "受講終了");
+        sut.updateCourseStatus(course.getId(), "受講終了");
         assertEquals("受講終了", course.getStatus());
     }
 
@@ -200,10 +215,11 @@ class StudentServiceTest {
     void 不正なステータスを指定した場合の例外処理() {
         // 準備
         StudentCourse course = new StudentCourse();
+        course.setId("123");
         course.setStatus("仮申込");
         // 実行、検証
         IllegalStateException exception = assertThrows(IllegalStateException.class, () -> {
-            sut.updateCourseStatus(course, "受講終了");
+            sut.updateCourseStatus(course.getId(), "受講終了");
         });
 
         assertEquals("無効なステータス遷移：仮申込->受講終了", exception.getMessage());

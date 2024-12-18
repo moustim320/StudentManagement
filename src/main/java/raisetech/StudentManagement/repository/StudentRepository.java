@@ -5,6 +5,7 @@ import raisetech.StudentManagement.data.Student;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * 受講生テーブルと受講生コース情報テーブルと紐づくRepositoryです。
@@ -87,4 +88,18 @@ public interface StudentRepository {
      * @param studentCourse 受講生コース情報
      */
     void updateStudentCourse(StudentCourse studentCourse);
+
+    /**
+     * 指定されたIDのStudentCourseを取得します。
+     * @param courseId コースID
+     * @return 対象のStudentCourseオブジェクト
+     */
+    Optional<StudentCourse> findById(String courseId);
+
+    /**
+     * コースステータスを更新します。
+     * @param courseId コースID
+     * @param status 更新後のステータス
+     */
+    void updateStudentCourseStatus(String courseId, String status);
 }

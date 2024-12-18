@@ -7,6 +7,7 @@ import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -16,6 +17,7 @@ import raisetech.StudentManagement.service.StudentService;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 /**
  * 受講生の検索や登録、更新などを行うREST APIとして受け付けるControllerです。
@@ -102,6 +104,21 @@ startDate,
             @RequestBody @Valid StudentDetail studentDetail){
         service.updateStudent(studentDetail);
         return ResponseEntity.ok("更新処理が成功しました。");
+    }
+
+    @Operation(summary = "コースステータス更新", description = "受講生のコースステータスを更新します。")
+    @PutMapping("/updateCourseStatus/{courseId}")
+    public ResponseEntity<String> updateCourseStatus(
+            @PathVariable String courseId,
+            @RequestParam @NotBlank String status) {
+        try {
+            service.updateCourseStatus(courseId, status);
+            return ResponseEntity.ok("コースステータスを更新しました。");
+        } catch (IllegalStateException e) {
+            return ResponseEntity.badRequest().body("エラー: " + e.getMessage());
+        } catch (NoSuchElementException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("エラー: 指定されたコースが見つかりません。");
+        }
     }
 
     //基本的にputは全体的な更新、patchは部分的な更新に使う

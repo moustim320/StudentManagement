@@ -11,6 +11,7 @@ import raisetech.StudentManagement.repository.StudentRepository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 /**
  * 受講生情報を取り扱うサービスです。
@@ -101,7 +102,18 @@ public class StudentService {
                 .forEach(studentCourse -> repository.updateStudentCourse(studentCourse));
     }
 
-    public void updateCourseStatus(StudentCourse course, String newStatus) {
+    /**
+     * 新しいステータスに更新します。
+     * ただし、有効なステータス遷移のみ許可されます。
+     * @param courseId 更新対象のコースID
+     * @param newStatus 更新後のステータス
+     * @throws IllegalStateException 無効なステータス遷移が試みられた場合
+     */
+    public void updateCourseStatus(String courseId, String newStatus) {
+        // コース情報をリポジトリから取得
+        StudentCourse course = repository.findById(courseId)
+                .orElseThrow(() -> new NoSuchElementException("指定されたコースが見つかりません: " + courseId));
+        // 現在のステータスをチェックして更新
         String currentStatus = course.getStatus();
         if (currentStatus.equals("仮申込") && newStatus.equals("本申込")) {
             course.setStatus(newStatus);
@@ -112,6 +124,8 @@ public class StudentService {
         } else {
             throw new IllegalStateException("無効なステータス遷移：" + currentStatus + "->" + newStatus);
         }
+        // 更新をDBに反映
+        repository.updateStudentCourseStatus(courseId, newStatus);
     }
 
 }
