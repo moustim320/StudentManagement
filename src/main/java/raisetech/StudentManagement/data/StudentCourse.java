@@ -15,4 +15,5 @@ public class StudentCourse {
     private String courseName;
     private LocalDateTime courseStartAt;
     private LocalDateTime courseEndAt;
+    private String status;
 }

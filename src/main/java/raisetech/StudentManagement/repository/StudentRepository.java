@@ -2,7 +2,10 @@ package raisetech.StudentManagement.repository;
 import org.apache.ibatis.annotations.*;
 import raisetech.StudentManagement.data.StudentCourse;
 import raisetech.StudentManagement.data.Student;
+
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * 受講生テーブルと受講生コース情報テーブルと紐づくRepositoryです。
@@ -37,6 +40,28 @@ public interface StudentRepository {
     List<StudentCourse> searchStudentCourse(String studentId);
 
     /**
+     * 指定された条件に一致する受講生を検索します。
+     * @param name 受講生名（部分一致検索）。nullの場合、条件に含めません。
+     * @return 検索結果に一致する受講生のリスト
+     */
+    List<Student> searchWithConditions(@Param("name") String name);
+
+    /**
+     * 指定された条件に一致する受講生コース情報を検索します。
+     * @param courseName コース名（部分一致検索）。nullの場合、条件に含めません。
+     * @param startDate コース開始日（指定された日付以降）。nullの場合、条件に含めません。
+     * @param endDate コース終了日（指定された日付以前）。nullの場合、条件に含めません。
+     * @param status コースのステータス（完全一致検索）。nullの場合、条件に含めません。
+     * @return 検索結果に一致する受講生コース情報のリスト
+     */
+    List<StudentCourse> searchStudentCourseListWithConditions(
+            String courseName,
+            LocalDateTime startDate,
+            LocalDateTime endDate,
+            String status
+    );
+
+    /**
      * 受講生を新規登録します。
      * IDは自動採番を行う。
      *
@@ -63,4 +88,18 @@ public interface StudentRepository {
      * @param studentCourse 受講生コース情報
      */
     void updateStudentCourse(StudentCourse studentCourse);
+
+    /**
+     * 指定されたIDのStudentCourseを取得します。
+     * @param courseId コースID
+     * @return 対象のStudentCourseオブジェクト
+     */
+    Optional<StudentCourse> findById(String courseId);
+
+    /**
+     * コースステータスを更新します。
+     * @param courseId コースID
+     * @param status 更新後のステータス
+     */
+    void updateStudentCourseStatus(String courseId, String status);
 }
