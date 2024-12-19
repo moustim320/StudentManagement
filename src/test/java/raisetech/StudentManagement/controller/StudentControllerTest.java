@@ -186,5 +186,12 @@ class StudentControllerTest {
                 .containsOnly("数字のみ入力するようにしてください。");
     }
 
+    @Test
+    void コースステータス更新が成功すること() throws Exception {
+        mockMvc.perform(put("/updateCourseStatus/{courseId}", "123")
+                        .param("status", "本申込"))
+                .andExpect(status().isOk())
+                .andExpect(content().string("コースステータスを更新しました。"));
+    }
 
 }

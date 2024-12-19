@@ -71,6 +71,12 @@ class StudentRepositoryTest {
     }
 
     @Test
+    void 存在しないIDで受講生を検索するとnullが返されること() {
+        Student actual = sut.searchStudent("999"); // 存在しないID
+        assertThat(actual).isNull();
+    }
+
+    @Test
     void 指定した条件で受講生を検索できること() {
         // 検索条件
         String name = "大野 智";
@@ -81,6 +87,12 @@ class StudentRepositoryTest {
         // 結果の確認
         assertThat(result).hasSize(1); // 1件だけ一致することを確認
         assertThat(result.get(0).getName()).isEqualTo(name); // 名前が一致することを確認
+    }
+
+    @Test
+    void 検索条件にnullを渡しても全件が取得できること() {
+        List<Student> actual = sut.searchWithConditions(null);
+        assertThat(actual).hasSize(5); // 初期データに基づく全件数
     }
 
     @Test
