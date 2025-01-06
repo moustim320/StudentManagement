@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Schema(description = "受講生コース情報")
 @Getter
@@ -15,5 +16,6 @@ public class StudentCourse {
     private String courseName;
     private LocalDateTime courseStartAt;
     private LocalDateTime courseEndAt;
-    private String status;
+
+    private List<CourseStatus> courseStatusList;
 }

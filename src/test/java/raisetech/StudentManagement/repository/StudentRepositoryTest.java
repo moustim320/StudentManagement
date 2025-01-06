@@ -3,6 +3,7 @@ package raisetech.StudentManagement.repository;
 import org.junit.jupiter.api.Test;
 import org.mybatis.spring.boot.test.autoconfigure.MybatisTest;
 import org.springframework.beans.factory.annotation.Autowired;
+import raisetech.StudentManagement.data.CourseStatus;
 import raisetech.StudentManagement.data.Student;
 import raisetech.StudentManagement.data.StudentCourse;
 
@@ -135,6 +136,13 @@ class StudentRepositoryTest {
     }
 
     @Test
+    public void 条件付きでコースステータスを検索できること() {
+        List<CourseStatus> result = sut.searchCourseStatusListWithConditions("仮申込");
+        assertNotNull(result);
+        assertFalse(result.isEmpty());
+    }
+
+    @Test
     void 新しい受講生コース情報を登録できること() {
         StudentCourse studentCourse = new StudentCourse();
         studentCourse.setStudentId("2");
@@ -146,6 +154,13 @@ class StudentRepositoryTest {
 
         List<StudentCourse> actual = sut.searchStudentCourse("2");
         assertThat(actual.size()).isEqualTo(2); //登録後の件数に応じて調整
+    }
+
+    @Test
+    public void コースIDで最新のコースステータスを取得できること() {
+        CourseStatus latestStatus = sut.findLatestCourseStatusByCourseId("1");
+        assertNotNull(latestStatus);
+        assertEquals("仮申込", latestStatus.getStatus());
     }
 
     @Test
@@ -171,6 +186,21 @@ class StudentRepositoryTest {
 
         List<StudentCourse> updateCourses = sut.searchStudentCourse("1");
         assertThat(updateCourses.get(0).getCourseName()).isEqualTo("新しいコース名");
+    }
+
+    @Test
+    public void コースステータスの登録と更新ができること() {
+        CourseStatus courseStatus = new CourseStatus();
+        courseStatus.setStudentsCoursesId(String.valueOf(1));
+        courseStatus.setStatus("仮申込");
+
+        sut.registerCourseStatus(courseStatus);
+
+        courseStatus.setStatus("本申込");
+        sut.updateCourseStatus(courseStatus);
+
+        CourseStatus updatedStatus = sut.findLatestCourseStatusByCourseId("1");
+        assertEquals("本申込", updatedStatus.getStatus());
     }
 
 }

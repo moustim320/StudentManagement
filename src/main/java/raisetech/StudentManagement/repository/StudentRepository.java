@@ -1,5 +1,6 @@
 package raisetech.StudentManagement.repository;
 import org.apache.ibatis.annotations.*;
+import raisetech.StudentManagement.data.CourseStatus;
 import raisetech.StudentManagement.data.StudentCourse;
 import raisetech.StudentManagement.data.Student;
 
@@ -62,6 +63,21 @@ public interface StudentRepository {
     );
 
     /**
+     * 条件に基づいてCourseStatusリストを検索します。
+     * @param status 検索するコースの状態
+     * @return 条件に一致するCourseStatusのリスト
+     */
+    List<CourseStatus> searchCourseStatusListWithConditions(@Param("status") String status);
+
+    /**
+     * 学生IDに基づいて、学生の受講したコースの状態を検索します。
+     * @param studentId 学生のID
+     * @return 学生IDに基づいて関連するCourseStatusのリスト
+     */
+    List<CourseStatus> searchCourseStatusByStudentId(@Param("studentId") String studentId);
+
+
+    /**
      * 受講生を新規登録します。
      * IDは自動採番を行う。
      *
@@ -78,6 +94,19 @@ public interface StudentRepository {
     void registerStudentCourse(StudentCourse studentCourse);
 
     /**
+     * 新しいCourseStatusを登録します。
+     * @param courseStatus コースの状態
+     */
+    void registerCourseStatus(CourseStatus courseStatus);
+
+    /**
+     * 指定されたコースIDに基づき、最新のCourseStatusを検索します。
+     * @param courseId コースのID
+     * @return 指定されたコースIDに関連する最新のCourseStatus
+     */
+    CourseStatus findLatestCourseStatusByCourseId(@Param("courseId") String courseId);
+
+    /**
      * 受講生を更新します。
      * @param student 受講生
      */
@@ -90,16 +119,8 @@ public interface StudentRepository {
     void updateStudentCourse(StudentCourse studentCourse);
 
     /**
-     * 指定されたIDのStudentCourseを取得します。
-     * @param courseId コースID
-     * @return 対象のStudentCourseオブジェクト
+     * 既存のCourseStatusを更新します。
+     * @param courseStatus 更新するCourseStatus。既存のCourseStatusのIDと一致するレコードが更新されます。
      */
-    Optional<StudentCourse> findById(String courseId);
-
-    /**
-     * コースステータスを更新します。
-     * @param courseId コースID
-     * @param status 更新後のステータス
-     */
-    void updateStudentCourseStatus(String courseId, String status);
+    void updateCourseStatus(CourseStatus courseStatus);
 }

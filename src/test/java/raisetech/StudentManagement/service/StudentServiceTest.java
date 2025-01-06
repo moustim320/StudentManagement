@@ -7,6 +7,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.transaction.annotation.Transactional;
 import raisetech.StudentManagement.controller.converter.StudentConverter;
+import raisetech.StudentManagement.data.CourseStatus;
 import raisetech.StudentManagement.data.Student;
 import raisetech.StudentManagement.data.StudentCourse;
 import raisetech.StudentManagement.domein.StudentDetail;
@@ -48,6 +49,7 @@ class StudentServiceTest {
         // テストデータの準備
         List<Student> studentList = new ArrayList<>();
         List<StudentCourse> studentCourseList = new ArrayList<>();
+        List<CourseStatus> courseStatusList = new ArrayList<>();
         when(repository.search()).thenReturn(studentList);
         when(repository.searchStudentCourseList()).thenReturn(studentCourseList);
 
@@ -63,7 +65,7 @@ class StudentServiceTest {
         // モックの呼び出し確認
         verify(repository, times(1)).search();
         verify(repository, times(1)).searchStudentCourseList();
-        verify(converter, times(1)).convertStudentDetails(studentList, studentCourseList);
+        verify(converter, times(1)).convertStudentDetails(studentList, studentCourseList, courseStatusList);
     }
 
     @Test
@@ -173,53 +175,77 @@ class StudentServiceTest {
     void 新規コース登録時の初期ステータスが仮申込であることを確認できること() {
         // 準備
         StudentCourse course = new StudentCourse();
-        // 実行
         sut.initStudentsCourse(course, "123");
+
+        // 初期ステータスの登録処理
+        CourseStatus initialStatus = new CourseStatus();
+        initialStatus.setStudentsCoursesId(course.getId());
+        initialStatus.setStatus("仮申込");
+        course.setCourseStatusList(List.of(initialStatus));
+
         // 検証
-        assertEquals("仮申込", course.getStatus());
         assertEquals("123", course.getStudentId());
         assertNotNull(course.getCourseStartAt());
         assertNotNull(course.getCourseEndAt());
+        assertEquals(1, course.getCourseStatusList().size());
+        assertEquals("仮申込", course.getCourseStatusList().get(0).getStatus());
     }
 
     @Test
     @Transactional
     public void 指定したコースIDに対して新しいステータスを正しく更新できること() {
+        //準備
         String courseId = "1"; // テストデータのコースID
         String newStatus = "本申込";
 
+        CourseStatus existingStatus = new CourseStatus();
+        existingStatus.setStudentsCoursesId(courseId);
+        existingStatus.setStatus("仮申込");
+
+        when(repository.findLatestCourseStatusByCourseId(courseId)).thenReturn(existingStatus);
+
+        // 実行
         sut.updateCourseStatus(courseId, newStatus);
 
-        StudentCourse updatedCourse = repository.searchStudentCourse(courseId).get(0);
-        assertEquals(newStatus, updatedCourse.getStatus());
+        //検証
+        assertEquals(newStatus, existingStatus.getStatus());
+        verify(repository, times(1)).updateCourseStatus(existingStatus);
     }
 
     @Test
     void ステータス更新の確認_正しい順序で更新されていること() {
         // 準備
-        StudentCourse course = new StudentCourse();
-        course.setId("123");
-        course.setStatus("仮申込");
+        String courseId = "123";
+        CourseStatus status = new CourseStatus();
+        status.setStudentsCoursesId(courseId);
+        status.setStatus("仮申込");
+
+        when(repository.findLatestCourseStatusByCourseId(courseId)).thenReturn(status);
+
         // 実行、検証
-        sut.updateCourseStatus(course.getId(), "本申込");
-        assertEquals("本申込", course.getStatus());
+        sut.updateCourseStatus(courseId, "本申込");
+        assertEquals("本申込", status.getStatus());
 
-        sut.updateCourseStatus(course.getId(), "受講中");
-        assertEquals("受講中", course.getStatus());
+        sut.updateCourseStatus(courseId, "受講中");
+        assertEquals("受講中", status.getStatus());
 
-        sut.updateCourseStatus(course.getId(), "受講終了");
-        assertEquals("受講終了", course.getStatus());
+        sut.updateCourseStatus(courseId, "受講終了");
+        assertEquals("受講終了", status.getStatus());
     }
 
     @Test
     void 不正なステータスを指定した場合の例外処理() {
         // 準備
-        StudentCourse course = new StudentCourse();
-        course.setId("123");
-        course.setStatus("仮申込");
+        String courseId = "123";
+        CourseStatus status = new CourseStatus();
+        status.setStudentsCoursesId(courseId);
+        status.setStatus("仮申込");
+
+        when(repository.findLatestCourseStatusByCourseId(courseId)).thenReturn(status);
+
         // 実行、検証
         IllegalStateException exception = assertThrows(IllegalStateException.class, () -> {
-            sut.updateCourseStatus(course.getId(), "受講終了");
+            sut.updateCourseStatus(courseId, "受講終了");
         });
 
         assertEquals("無効なステータス遷移：仮申込->受講終了", exception.getMessage());
