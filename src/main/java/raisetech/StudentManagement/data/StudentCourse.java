@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Schema(description = "受講生コース情報")
@@ -17,5 +18,5 @@ public class StudentCourse {
     private LocalDateTime courseStartAt;
     private LocalDateTime courseEndAt;
 
-    private List<CourseStatus> courseStatusList;
+    private List<CourseStatus> courseStatusList = new ArrayList<>();
 }

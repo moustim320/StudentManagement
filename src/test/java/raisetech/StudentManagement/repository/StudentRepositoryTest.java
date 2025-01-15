@@ -194,11 +194,14 @@ class StudentRepositoryTest {
         courseStatus.setStudentsCoursesId(String.valueOf(1));
         courseStatus.setStatus("仮申込");
 
+        // 登録処理
         sut.registerCourseStatus(courseStatus);
 
+        // 更新処理
         courseStatus.setStatus("本申込");
         sut.updateCourseStatus(courseStatus);
 
+        // 更新後データ確認
         CourseStatus updatedStatus = sut.findLatestCourseStatusByCourseId("1");
         assertEquals("本申込", updatedStatus.getStatus());
     }

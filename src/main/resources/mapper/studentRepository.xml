@@ -60,7 +60,7 @@
     </insert>
 
     <!-- CourseStatusを登録 -->
-    <insert id="registerCourseStatus" parameterType="raisetech.StudentManagement.data.CourseStatus">
+    <insert id="registerCourseStatus" parameterType="raisetech.StudentManagement.data.CourseStatus" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO course_status (students_courses_id, status)
         VALUES (#{studentsCoursesId}, #{status})
     </insert>

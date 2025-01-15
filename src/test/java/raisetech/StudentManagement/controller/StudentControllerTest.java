@@ -52,7 +52,7 @@ class StudentControllerTest {
         // MockMvc でリクエストを実行する部分
         mockMvc.perform(get("/studentList")  // エンドポイントを指定
                 .param("name", "森本光雄")   // リクエストパラメータを指定
-                .param("courseNme", "Aコース")
+                .param("courseName", "Aコース")
                 .param("startDate", "2024-04-01T00:00:00")  // ISO8601形式の日時
                 .param("endDate", "2025-03-31T00:00:00")
                 .param("status", "仮申込"))

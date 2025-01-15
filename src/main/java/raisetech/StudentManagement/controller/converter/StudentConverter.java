@@ -36,17 +36,7 @@ public class StudentConverter {
             studentDetail.setStudent(student);
 
             // 受講生に紐づくコースを抽出
-            List<StudentCourse> convertStudentCourseList = studentCourseList.stream()
-                    .filter(studentCourse -> student.getId().equals(studentCourse.getStudentId()))
-                    .peek(studentCourse -> {
-                        // 各コースに紐づくステータスを抽出して設定
-                        List<CourseStatus> convertCourseStatusList = courseStatusList.stream()
-                                .filter(courseStatus -> studentCourse.getId().equals(String.valueOf(courseStatus.getStudentsCoursesId())))
-                                .collect(Collectors.toList());
-                        studentCourse.setCourseStatusList(convertCourseStatusList);
-                    })
-                    .collect(Collectors.toList());
-
+            List<StudentCourse> convertStudentCourseList = extractStudentCourses(student, studentCourseList, courseStatusList);
 
             studentDetail.setStudentCourseList(convertStudentCourseList);
             studentDetails.add(studentDetail);
@@ -55,4 +45,27 @@ public class StudentConverter {
         return studentDetails;
     }
 
+    /**
+     * 特定の受講生に紐づく受講生コース情報とそのステータスを抽出する。
+     * @param student 受講生
+     * @param studentCourseList 受講生コース情報のリスト
+     * @param courseStatusList コースステータスのリスト
+     * @return 受講生に紐づくコース情報のリスト
+     */
+    private List<StudentCourse> extractStudentCourses(
+            Student student,
+            List<StudentCourse> studentCourseList,
+            List<CourseStatus> courseStatusList) {
+
+        return studentCourseList.stream()
+                .filter(studentCourse -> student.getId().equals(studentCourse.getStudentId()))
+                .peek(studentCourse -> {
+                    // 各コースに紐づくステータスを抽出して設定
+                    List<CourseStatus> convertCourseStatusList = courseStatusList.stream()
+                            .filter(courseStatus -> studentCourse.getId().equals(String.valueOf(courseStatus.getStudentsCoursesId())))
+                            .collect(Collectors.toList());
+                    studentCourse.setCourseStatusList(convertCourseStatusList);
+                })
+                .collect(Collectors.toList());
+    }
 }

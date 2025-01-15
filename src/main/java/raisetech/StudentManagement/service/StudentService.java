@@ -97,6 +97,25 @@ public class StudentService {
     }
 
     /**
+     * コースステータスの登録を行います。
+     * @param courseStatus 登録するコースステータス
+     * @throws IllegalArgumentException 引数が無効な場合
+     */
+    public void registerCourseStatus(CourseStatus courseStatus) {
+        // Validation: studentsCoursesId と status の必須チェック
+        if (courseStatus.getStudentsCoursesId() == null || courseStatus.getStudentsCoursesId().isEmpty()) {
+            throw new IllegalArgumentException("コースステータスの登録に必要な 'studentsCoursesId' が指定されていません。");
+        }
+        if (courseStatus.getStatus() == null || courseStatus.getStatus().isEmpty()) {
+            throw new IllegalArgumentException("コースステータスの登録に必要な 'status' が指定されていません。");
+        }
+
+        // コースステータスをリポジトリに登録
+        repository.registerCourseStatus(courseStatus);
+    }
+
+
+    /**
      * 受講生コース情報を登録する際の初期情報を設定する。
      *
      * @param studentCourse 受講生コース情報
@@ -131,6 +150,7 @@ public class StudentService {
      * @param newStatus 更新後のステータス
      * @throws IllegalStateException 無効なステータス遷移が試みられた場合
      */
+    @Transactional
     public void updateCourseStatus(String courseId, String newStatus) {
         // コース情報をリポジトリから取得
         CourseStatus courseStatus = repository.findLatestCourseStatusByCourseId(courseId);

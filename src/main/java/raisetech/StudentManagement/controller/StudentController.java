@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import raisetech.StudentManagement.data.CourseStatus;
 import raisetech.StudentManagement.domein.StudentDetail;
 import raisetech.StudentManagement.exceptionHandler.TestException;
 import raisetech.StudentManagement.service.StudentService;
@@ -38,7 +39,7 @@ public class StudentController {
      * 条件指定が可能です。条件が指定されない場合は全件検索を行います。
      * @param name 受講生名（部分一致検索）
      * @param courseName コース名（部分一致検索）
-     * @param  startDate コース開始日（指定された日付以降）
+     * @param startDate コース開始日（指定された日付以降）
      * @param endDate コース終了日（指定された日付以前）
      * @param status コースのステータス（指定されたステータス）
      * @return 受講生詳細一覧（条件に一致するもの、または全件）
@@ -93,6 +94,22 @@ startDate,
     }
 
     /**
+     * コースステータスの登録を行います。
+     * @param courseStatus コースステータス情報
+     * @return 実行結果
+     */
+    @Operation(summary = "コースステータス登録", description = "コースステータスを登録します。")
+    @PostMapping("/registerCourseStatus")
+    public ResponseEntity<String> registerCourseStatus(@Valid @RequestBody CourseStatus courseStatus) {
+        try {
+            service.registerCourseStatus(courseStatus);
+            return ResponseEntity.ok("コースステータスを登録しました。");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body("エラー: " + e.getMessage());
+        }
+    }
+
+    /**
      * 受講生詳細の更新を行います。
      * キャンセルフラグの更新もここで行います（論理削除）。
      * @param studentDetail 受講生詳細
@@ -122,6 +139,5 @@ startDate,
     }
 
     //基本的にputは全体的な更新、patchは部分的な更新に使う
-
 
 }

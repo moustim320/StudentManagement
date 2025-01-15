@@ -50,8 +50,11 @@ class StudentServiceTest {
         List<Student> studentList = new ArrayList<>();
         List<StudentCourse> studentCourseList = new ArrayList<>();
         List<CourseStatus> courseStatusList = new ArrayList<>();
-        when(repository.search()).thenReturn(studentList);
-        when(repository.searchStudentCourseList()).thenReturn(studentCourseList);
+
+        // モックの設定
+        when(repository.searchWithConditions(null)).thenReturn(studentList);
+        when(repository.searchStudentCourseListWithConditions(null, null, null, null)).thenReturn(studentCourseList);
+        when(repository.searchCourseStatusListWithConditions(null)).thenReturn(courseStatusList);
 
         // 必要な引数を渡す
         String name = null;
@@ -60,11 +63,13 @@ class StudentServiceTest {
         LocalDateTime endDate = null;
         String status = null;
 
+        // メソッド呼び出し
         sut.searchStudentList(name, courseName, startDate, endDate, status);
 
         // モックの呼び出し確認
-        verify(repository, times(1)).search();
-        verify(repository, times(1)).searchStudentCourseList();
+        verify(repository, times(1)).searchWithConditions(null);
+        verify(repository, times(1)).searchStudentCourseListWithConditions(null, null, null, null);
+        verify(repository, times(1)).searchCourseStatusListWithConditions(null);
         verify(converter, times(1)).convertStudentDetails(studentList, studentCourseList, courseStatusList);
     }
 
