@@ -2,6 +2,7 @@ package raisetech.StudentManagement.converter;
 
 import org.junit.jupiter.api.Test;
 import raisetech.StudentManagement.controller.converter.StudentConverter;
+import raisetech.StudentManagement.data.CourseStatus;
 import raisetech.StudentManagement.data.Student;
 import raisetech.StudentManagement.data.StudentCourse;
 import raisetech.StudentManagement.domein.StudentDetail;
@@ -22,17 +23,21 @@ class StudentConverterTest {
         //テストデータ作成
         Student student1 = createStudent("1", "森本", "モリモト", "モリ", "mori@example.com", "東京", 20, "女", "Remark1", false);
         Student student2 = createStudent("2", "森田", "モリモト", "モリ", "mori@example.com", "東京", 20, "女", "Remark1", false);
-
         List<Student> studentList = Arrays.asList(student1, student2);
 
         StudentCourse course1 = createStudentCourse("123", "1", "A", LocalDateTime.now(), LocalDateTime.now().plusMonths(1));
         StudentCourse course2 = createStudentCourse("135", "1", "B", LocalDateTime.now(), LocalDateTime.now().plusMonths(2));
         StudentCourse course3 = createStudentCourse("155", "2", "C", LocalDateTime.now(), LocalDateTime.now().plusMonths(3));
-
         List<StudentCourse> studentCourseList = Arrays.asList(course1, course2, course3);
 
+        CourseStatus status1 = createCourseStatus("1", "123", "受講中");
+        CourseStatus status2 = createCourseStatus("2", "135", "仮申込");
+        CourseStatus status3 = createCourseStatus("3", "155", "受講終了");
+        List<CourseStatus> courseStatusList = Arrays.asList(status1, status2, status3);
+
+
         //メソッド呼び出し
-        List<StudentDetail> result = studentConverter.convertStudentDetails(studentList, studentCourseList);
+        List<StudentDetail> result = studentConverter.convertStudentDetails(studentList, studentCourseList, courseStatusList);
 
         //検証
         assertThat(result).hasSize(2);
@@ -42,10 +47,17 @@ class StudentConverterTest {
         assertThat(detail1.getStudent()).isEqualTo(student1);
         assertThat(detail1.getStudentCourseList()).containsExactlyInAnyOrder(course1, course2);
 
+        // 森本のコースのステータス確認
+        assertThat(course1.getCourseStatusList()).containsExactly(status1);
+        assertThat(course2.getCourseStatusList()).containsExactly(status2);
+
         //StudentDetail森田
         StudentDetail detail2 = result.get(1);
         assertThat(detail2.getStudent()).isEqualTo(student2);
         assertThat(detail2.getStudentCourseList()).containsExactly(course3);
+
+        // 森田のコースのステータス確認
+        assertThat(course3.getCourseStatusList()).containsExactly(status3);
     }
 
     @Test
@@ -53,9 +65,10 @@ class StudentConverterTest {
         //空のデータ
         List<Student> studentList = new ArrayList<>();
         List<StudentCourse> studentCourseList = new ArrayList<>();
+        List<CourseStatus> courseStatusList = new ArrayList<>();
 
         //メソッド呼び出し
-        List<StudentDetail> result = studentConverter.convertStudentDetails(studentList, studentCourseList);
+        List<StudentDetail> result = studentConverter.convertStudentDetails(studentList, studentCourseList, courseStatusList);
 
         //検証
         assertThat(result).isEmpty();
@@ -72,15 +85,18 @@ class StudentConverterTest {
         StudentCourse course1 = createStudentCourse("123", "1", "A", LocalDateTime.now(), LocalDateTime.now().plusMonths(1));
         List<StudentCourse> studentCourseList = List.of(course1);
 
+        // 空のCourseStatusリストを渡す
+        List<CourseStatus> courseStatusList = new ArrayList<>();
+
         //メソッド呼び出し
-        List<StudentDetail> result = studentConverter.convertStudentDetails(studentList, studentCourseList);
+        List<StudentDetail> result = studentConverter.convertStudentDetails(studentList, studentCourseList, courseStatusList);
 
         //検証
         assertThat(result).hasSize(1);
 
         StudentDetail detail1 = result.get(0);
         assertThat(detail1.getStudent()).isEqualTo(student1);
-        assertThat(detail1.getStudentCourseList().isEmpty());
+        assertThat(detail1.getStudentCourseList().isEmpty());  // コース情報が空であること
     }
 
     //ヘルパーメソッド
@@ -107,5 +123,13 @@ class StudentConverterTest {
         course.setCourseStartAt(startAt);
         course.setCourseEndAt(endAt);
         return course;
+    }
+
+    private CourseStatus createCourseStatus(String id, String studentsCoursesId, String status) {
+        CourseStatus courseStatus = new CourseStatus();
+        courseStatus.setId(id);
+        courseStatus.setStudentsCoursesId(studentsCoursesId);
+        courseStatus.setStatus(status);
+        return courseStatus;
     }
 }
