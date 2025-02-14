@@ -43,8 +43,8 @@ jobs:
     - name: SSH Application Deploy
       uses: appleboy/ssh-action@master
       with:
-        host: ${{ env.ES2_HOST }}
-        username: ${{ env.ES2_USER }}
+        host: ${{ env.EC2_HOST }}
+        username: ${{ env.EC2_USER }}
         key: ${{ secrets.AWS_EC2_PRIVATE_KEY }}
         envs: DEST_PATH
         script: |
