@@ -45,7 +45,7 @@ jobs:
       with:
         host: ${{ env.ES2_HOST }}
         username: ${{ env.ES2_USER }}
-        key: ${{ secrets.EC2_PRIVATE_KEY }}
+        key: ${{ secrets.AWS_EC2_PRIVATE_KEY }}
         envs: DEST_PATH
         script: |
           sudo yum update -y
